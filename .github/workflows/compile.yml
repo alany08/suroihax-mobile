@@ -1,2 +1,34 @@
-- name: iOS Build Action
-  uses: yukiarrr/ios-build-action@v1.12.0
+name: iOS Build (Unsigned IPA)
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Xcode
+        uses: yukiarrr/ios-build-action@v1.12.0
+        with:
+          project-path: "YourApp.xcodeproj" # Change if using .xcworkspace
+          workspace-path: "YourApp.xcworkspace" # Required for CocoaPods
+          scheme: "YourApp"
+          sdk: "iphoneos"
+          configuration: "Release"
+          export-method: "none" # No signing
+          output-path: "output"
+          disable-codesigning: true # This prevents Xcode from requiring signing
+
+      - name: Upload Unsigned IPA
+        uses: actions/upload-artifact@v3
+        with:
+          name: unsigned-ipa
+          path: output/*.ipa
